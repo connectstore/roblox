@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vendas de Gift Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF;
+            box-sizing: border-box;
+        }
+
+        .toolbar {
+            background: linear-gradient(90deg, #3C3B6E, #4E75AF); /* Azul e Vermelho */
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .toolbar .header {
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .header .logo img {
+            padding: 5px;
+            width: 40px;
+            margin-right: -2.5px;
+        }
+
+        .header .title,
+        .header .powered-by {
+            text-align: left;
+            margin-top: -12px;
+        }
+
+        .header .title {
+            font-size: 30px;
+            font-weight: bold;
+            color: #FFFFFF;
+            white-space: nowrap;
+        }
+
+        .header .powered-by {
+            font-size: 16px;
+            color: #FFFFFF;
+            white-space: nowrap;
+        }
+
+        .header .profile {
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .header .profile img {
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .toolbar-options {
+            background-color: #FFFFFF;
+            display: flex;
+            padding: 0;
+            margin: 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-sizing: border-box;
+            margin-top: -3px;
+        }
+
+        .toolbar-options .option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .toolbar-options .option.active {
+            color: #4E75AF; /* Vermelho */
+            font-weight: bold;
+            border-bottom: 2px solid #4E75AF;
+        }
+
+        .toolbar-options .option.inactive {
+            color: #757575;
+        }
+
+        .content {
+            padding: 8px;
+        }
+
+        .content .section-title {
+            text-align: center;
+            color: #616161;
+            margin-bottom: 8px;
+        }
+
+        .container {
+            max-width: 500px;
+            background-color: #ffffff;
+            padding: 20px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.selected {
+            border: 2px solid #4E75AF; /* Vermelho */
+            transform: scale(1.05);
+        }
+
+        .highlight {
+            background: linear-gradient(90deg, #3C3B6E, #4E75AF); /* Azul e Vermelho */
+            color: #FFFFFF;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        .title {
+            font-size: 30px;
+            color: #333333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .value {
+            flex-grow: 1;
+            font-size: 20px;
+            color: #333333;
+            margin-left: 10px;
+        }
+
+        .popup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding-top: 32px;
+            padding-bottom: 8px;
+            background-color: #ffffff;
+            box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.2);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(100%);
+            max-height: 50%;
+            overflow-y: auto;
+        }
+
+        .popup.active {
+            display: block;
+            transform: translateY(0);
+        }
+
+        .popup .close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .popup .summary {
+            font-size: 20px;
+            color: #616161;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .popup .total {
+            font-size: 40px;
+            color: #616161;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .popup .fee {
+            font-size: 16px;
+            padding: 8px;
+            color: #616161;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .popup .message {
+            font-size: 16px;
+            color: #616161;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .button {
+            max-width: 350px;
+            margin: 8px 0;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            font-size: 18px;
+            color: #FFFFFF;
+            background-color: #4E75AF; /* Vermelho */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: #4E75AF; /* Vermelho escuro */
+        }
+
+        .cancel-button:hover {
+            background-color: #FF0000; /* Vermelho */
+        }
+
+        .bottom-button {
+            position: relative;
+            background: linear-gradient(90deg, #3C3B6E, #4E75AF); /* Azul e Vermelho */
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .cancel-button {
+            background: linear-gradient(90deg, #B22234, #FF0000); /* Vermelho e Vermelho escuro */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pay-button {
+            background: linear-gradient(90deg, #3C3B6E, #4E75AF); /* Azul e Vermelho */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: -12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="header">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" class="logo">
+                <div>
+                    <div class="title">Roblux</div>
+                    <div class="powered-by">Powered by Connect</div>
+                </div>
+            </div>
+            <div class="profile">
+                <img src="banner.png" alt="Profile Picture" />
+            </div>
+        </div>
+        <div class="toolbar-options">
+            <div class="option active">Brasil</div>
+            <div class="option inactive"></div>
+        </div>
+    </div>
+   
+    <div class="container">
+        <div class="subtitle">Selecione a quantidade de roblux</div>
+        <div class="card" onclick="selectCard('value30')">
+        <input type="radio" name="value" id="value30" value="30">
+        <label for="value30" class="value">400</label>
+        <span class="highlight">Mais pedido!</span>
+    </div>
+    <div class="card" onclick="selectCard('value60')">
+        <input type="radio" name="value" id="value60" value="60">
+        <label for="value60" class="value">800</label>
+    </div>
+    <div class="card" onclick="selectCard('value120')">
+        <input type="radio" name="value" id="value120" value="120">
+        <label for="value120" class="value">1.700</label>
+    </div>
+</div>
+
+<div class="popup" id="paymentPopup">
+        <div class="summary">Valor final do pedido</div>
+        <div class="total" id="orderTotal">R$ 20</div>
+        <div class="fee">Para processamento e emissão do cartão pré-pago incluímos uma taxa de R$ 5.</div>
+        <button href="#" class="button" id="payButton">REALIZAR PAGAMENTO</button>
+        <button class="button cancel-button" id="cancelButton">CANCELAR PEDIDO</button>
+    </div>
+
+<button class="button bottom-button" id="continueButton">CONTINUAR</button>
+
+<script>
+    //Oculta o botão "Continuar" ao abrir a página.
+    document.getElementById('continueButton').classList.add('hidden'); // Oculta o botão "Continuar"
+    
+    selectCard("value30");
+    
+    function selectCard(cardId) {
+        document.getElementById('paymentPopup').classList.remove('active');
+        // Mostra o botão "Continuar" ao selecionar a opção
+        document.getElementById('continueButton').classList.remove('hidden'); 
+        // Remove a classe 'selected' de todos os cards
+        var cards = document.querySelectorAll('.card');
+        cards.forEach(function(card) {
+            card.classList.remove('selected');
+        });
+
+        // Adiciona a classe 'selected' ao card clicado
+        var selectedCard = document.querySelector('input#' + cardId);
+        selectedCard.parentElement.classList.add('selected');
+        selectedCard.checked = true;
+    }
+
+
+    document.getElementById('continueButton').addEventListener('click', function() {
+        var selectedValue = document.querySelector('input[name="value"]:checked');
+        if (selectedValue) {
+            var value = selectedValue.value;
+            var total = parseInt(value) + 5;
+            document.getElementById('orderTotal').textContent = 'R$ ' + total;
+            document.getElementById('paymentPopup').classList.add('active');
+            document.getElementById('continueButton').classList.add('hidden'); // Oculta o botão "Continuar"
+        } else {
+            alert('Por favor, selecione um valor.');
+        }
+    });
+
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        document.getElementById('paymentPopup').classList.remove('active');
+        document.getElementById('continueButton').classList.remove('hidden'); // Mostra o botão "Continuar"
+    });
+
+    /*document.getElementById('payButton').addEventListener('click', function() {
+        var selectedValue = document.querySelector('input[name="value"]:checked').value;
+        var total = parseInt(selectedValue) + 5;
+        var message = "Quero concluir o meu pedido #PLAYSTATIONSTORE" + selectedValue + "\n\nDetalhes do pedido\n1x R$ " + selectedValue + " (PlayStation Store)\n1x R$ 5 (Taxa de processamento)";
+        var whatsappUrl = "https://api.whatsapp.com/send?phone=553398801838&text=" + encodeURIComponent(message);
+        window.location.href = whatsappUrl;
+    });*/
+    
+    // Nova forma de pagar
+    document.getElementById('payButton').addEventListener('click', function() {
+    var selectedValue = document.querySelector('input[name="value"]:checked').value;
+    var total = parseInt(selectedValue) + 5;
+    
+    // Constrói a URL de checkout corretamente
+    var checkoutUrl = "https://connectstore.github.io/checkout?payment=" + total + "&product=Roblox" + "&price=" + selectedValue;
+    window.location.href = checkoutUrl;
+});
+</script>
+
+</body>
+</html>
